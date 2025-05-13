@@ -122,9 +122,24 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+
 {
+    static HDC hdc;
+    static POINT point, pt[4], p[10000];
+    static int xLeft, yTop, count = 0;
     switch (message)
     {
+    case WM_LBUTTONDOWN:
+        xLeft = LOWORD(lParam);
+        yTop = HIWORD(lParam);
+
+        p[count].x = xLeft;
+        p[count].y = yTop;
+        hdc = GetDC(hWnd);
+        SetPixel(hdc, p[count].x, p[count].y, RGB(0, 0, 0));
+        ReleaseDC(hWnd, hdc);
+        count++;
+        break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
