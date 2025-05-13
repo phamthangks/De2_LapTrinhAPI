@@ -1,4 +1,4 @@
-// De2.cpp : Defines the entry point for the application.
+﻿// De2.cpp : Defines the entry point for the application.
 //
 
 #include "framework.h"
@@ -126,7 +126,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HDC hdc;
     static POINT point, pt[4], p[10000];
-    static int xLeft, yTop, count = 0;
+    static int xLeft, yTop, count = 0, cnt = 0;
     switch (message)
     {
     case WM_LBUTTONDOWN:
@@ -144,6 +144,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // Xoa mien thao tac
         count = 0; // Xoa tat ca diem da luu
         InvalidateRect(hWnd, NULL, TRUE); // Yeu cau ve lai toan bo cua so (nen trang)
+        break;
+
+    case WM_MOUSEMOVE:
+        if (wParam & MK_LBUTTON) // Kiểm tra nếu nút chuột trái đang được nhấn
+        {
+            hdc = GetDC(hWnd);
+            if (cnt > 0)
+            {
+                MoveToEx(hdc, p[cnt - 1].x, p[cnt - 1].y, NULL);
+                LineTo(hdc, LOWORD(lParam), HIWORD(lParam));
+            }
+
+            p[cnt].x = LOWORD(lParam);
+            p[cnt].y = HIWORD(lParam);
+            cnt++;
+
+            ReleaseDC(hWnd, hdc);
+        }
         break;
     case WM_COMMAND:
         {
