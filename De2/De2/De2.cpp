@@ -76,7 +76,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_DE2));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_DE2);
+    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDR_MENU1);
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
@@ -126,6 +126,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HDC hdc;
     static POINT point, pt[4], p[10000];
+    static HPEN hpen;
+    static COLORREF penColor = RGB(0, 0, 0);
     static int xLeft, yTop, count = 0, cnt = 0;
     switch (message)
     {
@@ -136,7 +138,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         p[count].x = xLeft;
         p[count].y = yTop;
         hdc = GetDC(hWnd);
+        hpen = CreatePen(PS_SOLID, 3, penColor); // Tạo bút với màu được chọn
+        SelectObject(hdc, hpen);
         SetPixel(hdc, p[count].x, p[count].y, RGB(0, 0, 0));
+        DeleteObject(hpen); // Xóa sau khi dùng
         ReleaseDC(hWnd, hdc);
         count++;
         break;
@@ -150,6 +155,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (wParam & MK_LBUTTON) // Kiểm tra nếu nút chuột trái đang được nhấn
         {
             hdc = GetDC(hWnd);
+
+            hpen = CreatePen(PS_SOLID, 3, penColor);
+            SelectObject(hdc, hpen);
             if (cnt > 0)
             {
                 MoveToEx(hdc, p[cnt - 1].x, p[cnt - 1].y, NULL);
@@ -160,6 +168,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             p[cnt].y = HIWORD(lParam);
             cnt++;
 
+
+            DeleteObject(hpen);
             ReleaseDC(hWnd, hdc);
         }
         break;
@@ -169,6 +179,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Parse the menu selections:
             switch (wmId)
             {
+            case ID_COLOR_Red:
+                penColor = RGB(255, 0, 0);
+                break;
+            case ID_COLOR_Yellow:
+                penColor = RGB(255, 255, 0);
+                break;
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                 break;
@@ -190,6 +206,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
+        DeleteObject(hpen);
         break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
