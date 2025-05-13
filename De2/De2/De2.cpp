@@ -140,6 +140,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         ReleaseDC(hWnd, hdc);
         count++;
         break;
+    case WM_RBUTTONDOWN:
+        // Xoa mien thao tac
+        count = 0; // Xoa tat ca diem da luu
+        InvalidateRect(hWnd, NULL, TRUE); // Yeu cau ve lai toan bo cua so (nen trang)
+        break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
